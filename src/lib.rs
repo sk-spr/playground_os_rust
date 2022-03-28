@@ -1,4 +1,5 @@
 #![feature(abi_x86_interrupt)]
+#![feature(alloc_error_handler)]
 #![no_std]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
@@ -10,11 +11,12 @@ pub mod interrupts;
 pub mod gdt;
 pub mod memory;
 pub mod allocator;
-//extern crate alloc;
+extern crate alloc;
 use core::panic::PanicInfo;
 
 #[cfg(test)]
 use bootloader::{entry_point, BootInfo};
+use x86_64::VirtAddr;
 
 #[cfg(test)]
 entry_point!(test_kernel_main);
@@ -63,17 +65,25 @@ pub fn hlt_loop() -> !{
     //loop{}
     loop{x86_64::instructions::hlt()}
 }
-pub fn init(){
+pub fn init(boot_info: &'static bootloader::BootInfo){
     vga_buffer::init();
     gdt::init();
     interrupts::init_idt();
     unsafe{interrupts::PICS.lock().initialize()};
     x86_64::instructions::interrupts::enable();
+    let phys_mem_off = VirtAddr::new(boot_info.physical_memory_offset);
+    let mut mapper = unsafe{memory::init(phys_mem_off)};
+    let mut frame_allocator = unsafe{memory::BootInfoFrameAllocator::init(&boot_info.memory_map)};
+    allocator::init_heap(&mut mapper, &mut frame_allocator).expect("Heap initialisation failed");
+}
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> !{
+    panic!("Allocation error: {:#?}", layout);
 }
 
 #[cfg(test)]
 pub fn test_kernel_main(boot_info: &'static BootInfo) -> !{
-    init();
+    init(boot_info);
     test_main();
     hlt_loop();
 }

@@ -5,8 +5,11 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
-use playground_os_rust::{memory, print, println, serial_print, serial_println};
+extern crate alloc;
+
+use playground_os_rust::{allocator, memory, print, println, serial_print, serial_println};
 use bootloader::{BootInfo, entry_point};
+use alloc::boxed::Box;
 
 static HELLO: &[u8] = b"Hello, world!";
 
@@ -51,20 +54,12 @@ entry_point!(kernel_main);
 
 ///Entry point for PlaygroundOS.
 pub fn kernel_main(boot_info: &'static BootInfo) -> !{
-    playground_os_rust::init();
+    playground_os_rust::init(boot_info);
+    serial_println!("HELLO");
     use x86_64::VirtAddr;
     use x86_64::structures::paging::Translate;
-    let phys_mem_off = VirtAddr::new(boot_info.physical_memory_offset);
-    let mut mapper = unsafe{memory::init(phys_mem_off)};
-    let mut frame_allocator = unsafe{memory::BootInfoFrameAllocator::init(&boot_info.memory_map)};
-    //map an unused page
-    use x86_64::structures::paging::Page;
-    let page = Page::containing_address(VirtAddr::new(0xdeadbeef));
-    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
 
-    let page_ptr : *mut u64 = page.start_address().as_mut_ptr();
-    unsafe{page_ptr.offset(400).write_volatile(0x_f021_f077_f065_f04e)};
-
+    let bx = Box::new(42);
 
     #[cfg(test)]
     test_main();
