@@ -5,6 +5,7 @@ use pic8259::ChainedPics;
 use lazy_static::lazy_static;
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
 use crate::vga_buffer;
+use crate::key_conversion::{KEYMAP_DE};
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[repr(u8)]
 ///Index in the PIC for various devices.
@@ -48,7 +49,6 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     use x86_64::instructions::port::Port;
     let mut port = Port::new(0x60);
     let scancode : u8 = unsafe{port.read()};
-    //TODO: write replacement for DE layout!
     lazy_static!{
         static ref KEYBOARD: spin::Mutex<Keyboard<layouts::Uk105Key, ScancodeSet1>> = spin::Mutex::new(Keyboard::new(layouts::Uk105Key, ScancodeSet1, HandleControl::Ignore));
     }
@@ -56,9 +56,11 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     if let Ok(Some(key_event)) = keyboard.add_byte(scancode){
         if let Some(key) = keyboard.process_keyevent(key_event){
             match key{
-                DecodedKey::Unicode(character) => match character{
-                    '\x08' => vga_buffer::WRITER.lock().backspace(0),
-                    _ => print!("{}", character)},
+                //TODO: write keyboard layout switching logic; global keymap var? files? todo.
+                DecodedKey::Unicode(character) =>
+                    match KEYMAP_DE.convert_char(character){
+                        '\x08' => vga_buffer::WRITER.lock().backspace(0),
+                        c => print!("{}", c)},
                 DecodedKey::RawKey(key) => print!("{:?}", key),
             }
         }
