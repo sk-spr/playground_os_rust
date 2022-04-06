@@ -12,6 +12,7 @@ pub mod gdt;
 pub mod memory;
 pub mod allocator;
 extern crate alloc;
+pub mod task;
 pub mod key_conversion;
 use core::panic::PanicInfo;
 
@@ -70,6 +71,7 @@ pub fn init(boot_info: &'static bootloader::BootInfo){
     vga_buffer::init();
     gdt::init();
     interrupts::init_idt();
+    interrupts::init_pit((1 / interrupts::PIT_MS_PER_INTERRUPT) * 1000);
     unsafe{interrupts::PICS.lock().initialize()};
     x86_64::instructions::interrupts::enable();
     let phys_mem_off = VirtAddr::new(boot_info.physical_memory_offset);
