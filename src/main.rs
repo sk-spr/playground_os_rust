@@ -55,22 +55,34 @@ entry_point!(kernel_main);
 ///Entry point for PlaygroundOS.
 pub fn kernel_main(boot_info: &'static BootInfo) -> !{
     playground_os_rust::init(boot_info);
-    serial_println!("HELLO");
-    use x86_64::VirtAddr;
-    use x86_64::structures::paging::Translate;
+    serial_println!("Hello serial!");
 
-    let bx = Box::new(42);
+    async fn async_fourty_two() -> u32{
+        42
+    }
 
+    async fn example_task(){
+        let number = async_fourty_two().await;
+        println!("{}", number);
+    }
+    example_task();
     #[cfg(test)]
     test_main();
 
     println!("It did not crash!");
+    let mut executor = Executor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_key_presses()));
+    executor.run();
     playground_os_rust::hlt_loop();
 }
 
 use core::panic::PanicInfo;
 use x86_64::VirtAddr;
 use playground_os_rust::memory::translate_addr;
+use playground_os_rust::task::simple_executor::SimpleExecutor;
+use playground_os_rust::task::{keyboard, Task};
+use playground_os_rust::task::executor::Executor;
 
 #[cfg(not(test))]
 #[panic_handler]
