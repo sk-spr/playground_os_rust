@@ -1,0 +1,17 @@
+KERNEL
+    [] pre-emptive multitasking
+        [x] configure timer to 1000 hz
+        [] task scheduling
+
+    [] file system support
+    [] userland
+        [] load binaries from disk
+        [] decide on binary / application format
+        [] execute binaries
+        [] proper shell
+    [] grub / iso
+        [] makefile
+        [] support for making an iso
+            [] filesystem
+                [] decide on a filesystem
+                [] make the file system during build
