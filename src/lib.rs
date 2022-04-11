@@ -15,6 +15,7 @@ extern crate alloc;
 pub mod task;
 pub mod key_conversion;
 pub mod storage;
+mod pci;
 use core::panic::PanicInfo;
 
 #[cfg(test)]
