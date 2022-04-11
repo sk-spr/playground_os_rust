@@ -66,6 +66,8 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> !{
         println!("{}", number);
     }
     example_task();
+    println!("Number of attached SCSI drives: {}",
+             playground_os_rust::storage::scsi::check_number_of_scsi_drives());
     #[cfg(test)]
     test_main();
 
