@@ -68,6 +68,10 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> !{
     example_task();
     println!("Number of attached SCSI drives: {}",
              playground_os_rust::storage::scsi::check_number_of_scsi_drives());
+    use playground_os_rust::pci::detect_pci_compat_bios;
+    let has_pci = detect_pci_compat_bios();
+    println!("System has PCI usable by configuration space 1: {}", has_pci);
+    let pci_devices = *playground_os_rust::pci::check_all_pci_devices();
     #[cfg(test)]
     test_main();
 
