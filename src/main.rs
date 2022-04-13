@@ -20,7 +20,7 @@ pub enum QemuExitCode{
     Success = 0x10,
     Failure = 0x11,
 }
-///Shutdown using QUEMU debug shutdown device (QEMU ONLY!)
+///Shutdown using QEMU debug shutdown device (QEMU ONLY!)
 pub fn exit_qemu(exit_code : QemuExitCode){
     use x86_64::instructions::port::Port;
     unsafe{
@@ -57,12 +57,12 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> !{
     playground_os_rust::init(boot_info);
     serial_println!("Hello serial!");
 
-    async fn async_fourty_two() -> u32{
+    async fn async_forty_two() -> u32{
         42
     }
 
     async fn example_task(){
-        let number = async_fourty_two().await;
+        let number = async_forty_two().await;
         println!("{}", number);
     }
     example_task();
@@ -76,7 +76,6 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> !{
     executor.spawn(Task::new(example_task()));
     executor.spawn(Task::new(keyboard::print_key_presses()));
     executor.run();
-    playground_os_rust::hlt_loop();
 }
 
 use core::panic::PanicInfo;

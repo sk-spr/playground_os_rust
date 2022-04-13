@@ -18,7 +18,7 @@ unsafe impl GlobalAlloc for Dummy{
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8{
         null_mut()
     }
-    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
         panic!("dealloc should never be called");
     }
 }
@@ -52,7 +52,7 @@ static ALLOCATOR:LockedHeap = LockedHeap::empty();
 
 #[test_case]
 fn test_heap_box(){
-    let b = Box::new(42);
+    let _b = Box::new(42);
 }
 #[test_case]
 fn test_heap_vec(){

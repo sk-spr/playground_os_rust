@@ -177,7 +177,7 @@ pub struct BufferedWriter{
 }
 impl BufferedWriter{
     fn write_buf(&mut self){
-        for i in 0..BUFFER_HEIGHT{
+        for _ in 0..BUFFER_HEIGHT{
             //TODO: convert to longbuffer coords
             //TODO: write last part of longbuffer to writer
         }
@@ -204,8 +204,8 @@ lazy_static!{
 }
 
 pub fn init(){
-    for y in 0..BUFFER_HEIGHT{
-        for x in 0..BUFFER_WIDTH{
+    for _ in 0..BUFFER_HEIGHT{
+        for _ in 0..BUFFER_WIDTH{
             WRITER.lock().write_byte(0x0);
         }
     }
@@ -237,13 +237,13 @@ fn trivial_assertion(){
 }
 #[test_case]
 fn print_nopanic(){
-    for i in 0..200{
+    for _ in 0..200{
         print!("A string abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!,;:dkgsoihoasdf");
     }
 }
 #[test_case]
 fn println_nopanic(){
-    for i in 0..200{
+    for _ in 0..200{
         println!("A line. Here is a line. Still going. Whatevs bruh.");
     }
 }
