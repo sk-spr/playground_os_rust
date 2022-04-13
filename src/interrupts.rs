@@ -21,10 +21,10 @@ pub enum InterruptIndex{
 }
 // Helper functions for the Interrupt index.
 impl InterruptIndex{
-    fn as_u8(self)-> u8{
+    fn as_u8(&self)-> u8{
         self as u8
     }
-    fn as_usize(self)->usize{
+    fn as_usize(&self)->usize{
         usize::from(self.as_u8())
     }
 }
@@ -69,7 +69,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame:InterruptStackFrame){
     println!("Exception: Breakpoint \n {:#?}", stack_frame);
 }
 ///Double fault handler.
-extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, error_code: u64) -> !{
+extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> !{
     panic!("Exception: Double Fault\n{:#?}", stack_frame);
 }
 use x86_64::structures::idt::PageFaultErrorCode;

@@ -3,6 +3,7 @@
 #![no_std]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
+#![feature(abi_x86_interrupt)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 pub mod vga_buffer;
@@ -31,7 +32,7 @@ pub enum QemuExitCode{
     Success = 0x10,
     Failure = 0x11,
 }
-///Shutdown using QUEMU debug shutdown device (QEMU ONLY!)
+///Shutdown using QEMU debug shutdown device (QEMU ONLY!)
 pub fn exit_qemu(exit_code : QemuExitCode){
     use x86_64::instructions::port::Port;
     unsafe{
